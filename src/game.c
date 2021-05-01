@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include <glad/glad.h>
 #include <glfw/glfw.h>
 
@@ -16,10 +17,12 @@ const char *fragment_shader_source =
     "#version 330 core\n"
     "out vec4 frag_color;\n"
     "\n"
+    "uniform vec4 color;\n"
+    "\n"
     "void\n"
     "main()\n"
     "{\n"
-    "        frag_color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "        frag_color = color;\n"
     "}\0";
 
 /*
@@ -61,6 +64,9 @@ int main(int argc, char **argv)
 	unsigned int shader_program;
 	int success;
 	char info_log[512];
+        float secs;
+        float green_val;
+        int color_loc;
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -144,19 +150,20 @@ int main(int argc, char **argv)
 			      (void *) 0);
 	glEnableVertexAttribArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
 	while (!glfwWindowShouldClose(window)) {
 		process_input(window);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+                secs = glfwGetTime();
+                green_val = (sin(secs) / 2.0f) + 0.5f;
+                color_loc = glGetUniformLocation(shader_program, "color");
 		glUseProgram(shader_program);
+                glUniform4f(color_loc, 0.0f, green_val, 0.0f, 1.0f);
+
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
