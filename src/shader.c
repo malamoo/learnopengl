@@ -3,22 +3,30 @@
 #include <glad/glad.h>
 #include <glfw/glfw.h>
 
-/* Returns the text of a specified file. */
+/* Returns the number of bytes in a file. */
+long countbytes(FILE * fp)
+{
+	long bytecount;
+
+	fseek(fp, 0, SEEK_END);
+	bytecount = ftell(fp);
+	rewind(fp);
+
+	return bytecount;
+}
+
+/* Returns the text from a file as a string. */
 char *readfile(const char *filename)
 {
 	FILE *fp;
-	int numbytes;
+	long bytecount;
 	char *str;
 
 	fp = fopen(filename, "r");
-	fseek(fp, 0, SEEK_END);
-	numbytes = ftell(fp);
-	rewind(fp);
-
-	str = calloc(numbytes + 1, sizeof(char));
-	str[numbytes] = '\0';
-
-	fread(str, sizeof(char), numbytes, fp);
+	bytecount = countbytes(fp);
+	str = calloc(bytecount + 1, sizeof(char));
+	str[bytecount] = '\0';
+	fread(str, sizeof(char), bytecount, fp);
 	fclose(fp);
 
 	return str;
