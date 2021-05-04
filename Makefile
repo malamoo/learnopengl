@@ -24,7 +24,7 @@ all: mkdir bin/game
 mkdir:
 	mkdir -p build bin
 
-bin/game: build/glfw.o build/glad.o build/game.o
+bin/game: build/glfw.o build/glad.o build/shader.o build/game.o
 	cc $(GLFW_FWS) -o $@ $^ $(LIBS)
 
 build/glfw.o: external/glfw.c
@@ -32,6 +32,9 @@ build/glfw.o: external/glfw.c
 
 build/glad.o: external/glad.c
 	cc $(GLAD_CFLAGS) -c $^ -o $@
+
+build/shader.o: src/shader.c
+	cc $(CFLAGS) -c $^ -o $@
 
 build/game.o: src/game.c
 	cc $(CFLAGS) -c $^ -o $@
