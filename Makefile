@@ -1,11 +1,11 @@
-CFLAGS = -Wall -Werror -std=c99 -Iinclude
+CFLAGS = -Wall -Werror -std=c99 -Iinclude -Iexternal/include
 LIBS = -lm -ldl -pthread
 
 GLFW_CFLAGS = -w
 GLFW_DEFS = -DLSH_GLFW_IMPLEMENTATION 
 GLFW_FWS =
 
-GLAD_CFLAGS = -w -Iinclude
+GLAD_CFLAGS = -w -Iexternal/include
 
 UNAME_S = $(shell uname -s)
 ifeq ($(UNAME_S), Linux)
@@ -27,10 +27,10 @@ mkdir:
 bin/game: build/glfw.o build/glad.o build/shader.o build/game.o
 	cc $(GLFW_FWS) -o $@ $^ $(LIBS)
 
-build/glfw.o: external/glfw.c
+build/glfw.o: external/src/glfw.c
 	cc $(GLFW_CFLAGS) $(GLFW_DEFS) $(GLFW_FWS) -c $^ -o $@
 
-build/glad.o: external/glad.c
+build/glad.o: external/src/glad.c
 	cc $(GLAD_CFLAGS) -c $^ -o $@
 
 build/shader.o: src/shader.c
