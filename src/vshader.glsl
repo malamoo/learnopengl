@@ -9,4 +9,4 @@ void main()
 {
         gl_Position = vec4(apos.x, apos.y, apos.z, 1.0);
         vtxcolor = acolor; 
-};
+}
