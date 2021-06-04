@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <glad/glad.h>
 #include <glfw/glfw.h>
-#include <shader.h>
+#include "../include/shader.h"
+#include "../include/texture.h"
 
 /* Resizes the OpenGL viewport when the window dimensions change. */
 void resizevp(GLFWwindow * window, int width, int height)
@@ -20,11 +22,16 @@ void processinput(GLFWwindow * window)
 int main(int argc, char **argv)
 {
 	GLFWwindow *window;
-	float verts[] = {
-		0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+	float vertices[] = {
+		0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f
 	};
+        unsigned int indices[] = {
+                0, 1, 3,
+                1, 2, 3
+        };
 	unsigned int vbo;
 	unsigned int vao;
 	unsigned int ebo;
@@ -32,6 +39,8 @@ int main(int argc, char **argv)
 	float secs;
 	float green;
 	int colorloc;
+	unsigned int tex;
+	unsigned char *texdata;
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -62,6 +71,18 @@ int main(int argc, char **argv)
 
 	shader = makeshader("src/vshader.glsl", "src/fshader.glsl");
 
+	texdata = loadimg("res/tex/cobble_ceiling.png");
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0,
+		     GL_RGB, GL_UNSIGNED_BYTE, texdata);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	free(texdata);
+
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
 	glGenBuffers(1, &ebo);
@@ -69,15 +90,22 @@ int main(int argc, char **argv)
 	glBindVertexArray(vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts,
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
 		     GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+		     GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
 			      (void *) 0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
 			      (void *) (3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+			      (void *) (6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	while (!glfwWindowShouldClose(window)) {
 		processinput(window);
@@ -91,8 +119,9 @@ int main(int argc, char **argv)
 		glUseProgram(shader);
 		glUniform4f(colorloc, 0.0f, green, 0.0f, 1.0f);
 
+                glBindTexture(GL_TEXTURE_2D, tex);
 		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

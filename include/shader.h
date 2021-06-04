@@ -1,1 +1,1 @@
-unsigned int makeshader();
+unsigned int makeshader(const char *vsfilename, const char *fsfilename);
