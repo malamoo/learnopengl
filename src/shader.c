@@ -1,87 +1,81 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <glad/glad.h>
-#include <glfw/glfw.h>
+#include "../ext/glad.h"
+#include "../ext/glfw.h"
 
 /* Returns the number of bytes in a file. */
-long countbytes(FILE * fp)
+long cntbytes(FILE *fp)
 {
-	long bytecount;
+        long cnt;
 
-	fseek(fp, 0, SEEK_END);
-	bytecount = ftell(fp);
-	rewind(fp);
-
-	return bytecount;
+        fseek(fp, 0, SEEK_END);
+        cnt = ftell(fp);
+        rewind(fp);
+        return cnt;
 }
 
-/* Returns the text from a file as a string. */
-char *readfile(const char *filename)
+/* Returns a file's characters as a string. */
+char *freadstr(char *name)
 {
-	FILE *fp;
-	long bytecount;
-	char *str;
+        FILE *fp;
+        long cnt;
+        char *str;
 
-	fp = fopen(filename, "r");
-	bytecount = countbytes(fp);
-	str = calloc(bytecount + 1, sizeof(char));
-	str[bytecount] = '\0';
-	fread(str, sizeof(char), bytecount, fp);
-	fclose(fp);
-
-	return str;
+        fp = fopen(name, "r");
+        cnt = cntbytes(fp);
+        str = calloc(cnt + 1, sizeof(char));
+        str[cnt] = '\0';
+        fread(str, sizeof(char), cnt, fp);
+        fclose(fp);
+        return str;
 }
 
 /*
  * Makes an OpenGL shader program with the specified vertex and fragment
  * shaders.
  */
-unsigned int makeshader(const char *vsfilename, const char *fsfilename)
+unsigned int makeshader(char *vsname, char *fsname)
 {
-	unsigned int vshader;
-	unsigned int fshader;
-	unsigned int program;
-	char *src;
-	int success;
-	char infolog[512];
+        unsigned int vshader;
+        unsigned int fshader;
+        unsigned int program;
+        int success;
+        char log[512];
+        char *src;
 
-	src = readfile(vsfilename);
-	vshader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vshader, 1, (const char **) &src, NULL);
-	glCompileShader(vshader);
-	glGetShaderiv(vshader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(vshader, 512, NULL, infolog);
-		printf("Error: vertex shader compilation failed\n");
-		printf("%s\n", infolog);
-	}
-	free(src);
-
-	src = readfile(fsfilename);
-	fshader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fshader, 1, (const char **) &src, NULL);
-	glCompileShader(fshader);
-	glGetShaderiv(fshader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(fshader, 512, NULL, infolog);
-		printf("Error: vertex shader compilation failed\n");
-		printf("%s\n", infolog);
-	}
-	free(src);
-
-	program = glCreateProgram();
-	glAttachShader(program, vshader);
-	glAttachShader(program, fshader);
-	glLinkProgram(program);
-	glGetProgramiv(program, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(program, 512, NULL, infolog);
-		printf("Error: shader program linking failed\n");
-		printf("%s\n", infolog);
-	}
-
-	glDeleteShader(vshader);
-	glDeleteShader(fshader);
-
-	return program;
+        vshader = glCreateShader(GL_VERTEX_SHADER);
+        src = freadstr(vsname);
+        glShaderSource(vshader, 1, (const char **)&src, NULL);
+        glCompileShader(vshader);
+        glGetShaderiv(vshader, GL_COMPILE_STATUS, &success);
+        if (!success) {
+                glGetShaderInfoLog(vshader, 512, NULL, log);
+                printf("Error: shader compilation failed\n");
+                printf("%s\n", log);
+        }
+        free(src);
+        fshader = glCreateShader(GL_FRAGMENT_SHADER);
+        src = freadstr(fsname);
+        glShaderSource(fshader, 1, (const char **)&src, NULL);
+        glCompileShader(fshader);
+        glGetShaderiv(fshader, GL_COMPILE_STATUS, &success);
+        if (!success) {
+                glGetShaderInfoLog(fshader, 512, NULL, log);
+                printf("Error: shader compilation failed\n");
+                printf("%s\n", log);
+        }
+        free(src);
+        program = glCreateProgram();
+        glAttachShader(program, vshader);
+        glAttachShader(program, fshader);
+        glLinkProgram(program);
+        glGetProgramiv(program, GL_LINK_STATUS, &success);
+        if (!success) {
+                glGetShaderInfoLog(program, 512, NULL, log);
+                printf("Error: shader program linking failed\n");
+                printf("%s\n", log);
+        }
+        glDeleteShader(vshader);
+        glDeleteShader(fshader);
+        return program;
 }
