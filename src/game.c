@@ -3,6 +3,7 @@
 #include "../ext/glfw.h"
 #include "../ext/stb_image.h"
 #include "../include/shader.h"
+#include "../include/texture.h"
 
 /* Resizes the OpenGL viewport when the window dimensions change. */
 void resize(GLFWwindow *window, int width, int height)
@@ -15,33 +16,6 @@ void processinput(GLFWwindow *window)
 {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
                 glfwSetWindowShouldClose(window, 1);
-}
-
-/* Generates a texture from the specified image file. */
-unsigned int gentexture(char *name)
-{
-        unsigned int texture;
-        int width;
-        int height;
-        int channels;
-        unsigned char *data;
-
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        data = stbi_load(name, &width, &height, &channels, 0);
-        if (data) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                             GL_UNSIGNED_BYTE, data);
-                glGenerateMipmap(GL_TEXTURE_2D);
-        } else {
-                printf("Error: failed to load texture");
-        }
-        stbi_image_free(data);
-        return texture;
 }
 
 int main(void)
@@ -84,7 +58,7 @@ int main(void)
         glViewport(0, 0, 800, 600);
         glfwSetFramebufferSizeCallback(window, resize);
         shader = makeshader("src/vshader.glsl", "src/fshader.glsl");
-        texture = gentexture("res/container.jpeg");
+        texture = maketexture("res/container.jpeg");
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
         glGenBuffers(1, &ebo);

@@ -24,7 +24,7 @@ mkdir:
 	mkdir -p build bin
 
 bin/game: build/glfw.o build/glad.o build/stb_image.o build/shader.o \
-	  build/game.o
+	  build/game.o build/texture.o
 	cc $(GLFW_FWS) -o $@ $^ $(LIBS)
 
 build/glfw.o: ext/glfw.c
@@ -35,6 +35,9 @@ build/glad.o: ext/glad.c
 
 build/stb_image.o: ext/stb_image.c
 	cc $(STB_CFLAGS) -c $^ -o $@
+
+build/texture.o: src/texture.c
+	cc $(CFLAGS) -c $^ -o $@
 
 build/shader.o: src/shader.c
 	cc $(CFLAGS) -c $^ -o $@
