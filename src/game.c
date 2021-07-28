@@ -22,10 +22,11 @@ int main(void)
 {
         GLFWwindow *window;
         float vertices[] = {
-                0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-                0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-                -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-                -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f
+                /* positions         colors              texture coords */
+                0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, /* top right */
+                0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, /* bottom right */
+               -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, /* bottom left */
+               -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  /* top left */
         };
         unsigned int indices[] = {
                 0, 1, 3,
@@ -35,7 +36,8 @@ int main(void)
         unsigned int vao;
         unsigned int ebo;
         unsigned int shader;
-        unsigned int texture;
+        unsigned int tex1;
+        unsigned int tex2;
 
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -58,7 +60,8 @@ int main(void)
         glViewport(0, 0, 800, 600);
         glfwSetFramebufferSizeCallback(window, resize);
         shader = makeshader("src/vshader.glsl", "src/fshader.glsl");
-        texture = maketexture("res/container.jpeg");
+        tex1 = maketexture("res/container.jpeg");
+        tex2 = maketexture("res/awesomeface.png");
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
         glGenBuffers(1, &ebo);
@@ -78,12 +81,17 @@ int main(void)
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                               (void *)(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
+        glUseProgram(shader);
+        glUniform1i(glGetUniformLocation(shader, "tex1"), 0);
+        glUniform1i(glGetUniformLocation(shader, "tex2"), 1);
         while (!glfwWindowShouldClose(window)) {
                 processinput(window);
                 glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
-                glUseProgram(shader);
-                glBindTexture(GL_TEXTURE_2D, texture);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, tex1);
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, tex2);
                 glBindVertexArray(vao);
                 glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
                 glfwSwapBuffers(window);
