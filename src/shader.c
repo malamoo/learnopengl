@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include "../ext/glad.h"
 #include "../ext/glfw.h"
+#include "../include/shader.h"
+
+long cntbytes(FILE *fp);
+char *freadstr(char *name);
 
 /* Returns the number of bytes in a file. */
 long cntbytes(FILE *fp)

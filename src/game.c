@@ -5,6 +5,9 @@
 #include "../include/shader.h"
 #include "../include/texture.h"
 
+void resize(GLFWwindow *window, int width, int height);
+void processinput(GLFWwindow *window);
+
 /* Resizes the OpenGL viewport when the window dimensions change. */
 void resize(GLFWwindow *window, int width, int height)
 {
