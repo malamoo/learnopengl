@@ -6,7 +6,7 @@
 #include "../include/texture.h"
 
 void resize(GLFWwindow *window, int width, int height);
-void processinput(GLFWwindow *window);
+void procinput(GLFWwindow *window);
 
 /* Resizes the OpenGL viewport when the window dimensions change. */
 void resize(GLFWwindow *window, int width, int height)
@@ -15,7 +15,7 @@ void resize(GLFWwindow *window, int width, int height)
 }
 
 /* Processes the window input. */
-void processinput(GLFWwindow *window)
+void procinput(GLFWwindow *window)
 {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
                 glfwSetWindowShouldClose(window, 1);
@@ -88,7 +88,7 @@ int main(void)
         glUniform1i(glGetUniformLocation(shader, "tex1"), 0);
         glUniform1i(glGetUniformLocation(shader, "tex2"), 1);
         while (!glfwWindowShouldClose(window)) {
-                processinput(window);
+                procinput(window);
                 glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
                 glActiveTexture(GL_TEXTURE0);
