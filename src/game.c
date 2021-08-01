@@ -2,6 +2,7 @@
 #include "../ext/glad.h"
 #include "../ext/glfw.h"
 #include "../ext/stb_image.h"
+#include "../ext/hypatia.h"
 #include "../include/shader.h"
 #include "../include/texture.h"
 
@@ -25,11 +26,11 @@ int main(void)
 {
         GLFWwindow *window;
         float vertices[] = {
-                /* positions         colors              texture coords */
-                0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, /* top right */
-                0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, /* bottom right */
-               -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, /* bottom left */
-               -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  /* top left */
+                /* positions         texture coords */
+                0.5f,  0.5f, 0.0f,   1.0f, 1.0f, /* top right */
+                0.5f, -0.5f, 0.0f,   1.0f, 0.0f, /* bottom right */
+               -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, /* bottom left */
+               -0.5f,  0.5f, 0.0f,   0.0f, 1.0f  /* top left */
         };
         unsigned int indices[] = {
                 0, 1, 3,
@@ -41,6 +42,8 @@ int main(void)
         unsigned int shader;
         unsigned int tex1;
         unsigned int tex2;
+        struct vector3 translate;
+        struct matrix4 transform;
 
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -75,19 +78,20 @@ int main(void)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
                      GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                               (void *)0);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                               (void *)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                              (void *)(6 * sizeof(float)));
-        glEnableVertexAttribArray(2);
         glUseProgram(shader);
         glUniform1i(glGetUniformLocation(shader, "tex1"), 0);
         glUniform1i(glGetUniformLocation(shader, "tex2"), 1);
         while (!glfwWindowShouldClose(window)) {
+                matrix4_make_transformation_rotationf_z(&transform, (float)glfwGetTime());
+                vector3_setf3(&translate, 0.5f, -0.5f, 0.0f);
+                matrix4_translatev3(&transform, &translate);
+                glUniformMatrix4fv(glGetUniformLocation(shader, "transform"), 1, GL_TRUE, transform.m);
                 procinput(window);
                 glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
