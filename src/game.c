@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "../ext/glad.h"
-#include "../ext/glfw.h"
-#include "../ext/stb_image.h"
-#include "../ext/hypatia.h"
+#include "../external/glad.h"
+#include "../external/glfw.h"
+#include "../external/stb_image.h"
+#include "../external/hypatia.h"
 #include "../include/shader.h"
 #include "../include/texture.h"
 
@@ -66,8 +66,8 @@ int main(void)
         glViewport(0, 0, 800, 600);
         glfwSetFramebufferSizeCallback(window, resize);
         shader = makeshader("src/vshader.glsl", "src/fshader.glsl");
-        tex1 = maketexture("res/container.jpeg");
-        tex2 = maketexture("res/awesomeface.png");
+        tex1 = maketexture("assets/container.jpeg");
+        tex2 = maketexture("assets/awesomeface.png");
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
         glGenBuffers(1, &ebo);

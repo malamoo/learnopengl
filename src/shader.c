@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../ext/glad.h"
-#include "../ext/glfw.h"
+#include "../external/glad.h"
+#include "../external/glfw.h"
 #include "../include/shader.h"
 
 long cntbytes(FILE *fp);

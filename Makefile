@@ -28,16 +28,16 @@ bin/game: build/glfw.o build/glad.o build/stb_image.o build/hypatia.o \
 		  build/shader.o build/texture.o build/game.o
 	cc $(GLFW_FWS) -o $@ $^ $(LIBS)
 
-build/glfw.o: ext/glfw.c
+build/glfw.o: external/glfw.c
 	cc $(GLFW_CFLAGS) $(GLFW_DEFS) $(GLFW_FWS) -c $^ -o $@
 
-build/glad.o: ext/glad.c
+build/glad.o: external/glad.c
 	cc $(GLAD_CFLAGS) -c $^ -o $@
 
-build/stb_image.o: ext/stb_image.c
+build/stb_image.o: external/stb_image.c
 	cc $(STB_CFLAGS) -c $^ -o $@
 
-build/hypatia.o: ext/hypatia.c
+build/hypatia.o: external/hypatia.c
 	cc $(HYP_CFLAGS) -c $^ -o $@
 
 build/texture.o: src/texture.c
