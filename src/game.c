@@ -26,25 +26,76 @@ int main(void)
 {
         GLFWwindow *window;
         float vertices[] = {
-                /* positions         texture coords */
-                0.5f,  0.5f, 0.0f,   1.0f, 1.0f, /* top right */
-                0.5f, -0.5f, 0.0f,   1.0f, 0.0f, /* bottom right */
-               -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, /* bottom left */
-               -0.5f,  0.5f, 0.0f,   0.0f, 1.0f  /* top left */
+                /* positions            texture coords */
+               -0.5f, -0.5f, -0.5f,     0.0f, 0.0f,
+                0.5f, -0.5f, -0.5f,     1.0f, 0.0f,
+                0.5f,  0.5f, -0.5f,     1.0f, 1.0f,
+                0.5f,  0.5f, -0.5f,     1.0f, 1.0f,
+
+               -0.5f,  0.5f, -0.5f,     0.0f, 1.0f,
+               -0.5f, -0.5f, -0.5f,     0.0f, 0.0f,
+               -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,
+                0.5f, -0.5f,  0.5f,     1.0f, 0.0f,
+
+                0.5f,  0.5f,  0.5f,     1.0f, 1.0f,
+                0.5f,  0.5f,  0.5f,     1.0f, 1.0f,
+               -0.5f,  0.5f,  0.5f,     0.0f, 1.0f,
+               -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,
+
+               -0.5f,  0.5f,  0.5f,     1.0f, 0.0f,
+               -0.5f,  0.5f, -0.5f,     1.0f, 1.0f,
+               -0.5f, -0.5f, -0.5f,     0.0f, 1.0f,
+               -0.5f, -0.5f, -0.5f,     0.0f, 1.0f,
+
+               -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,
+               -0.5f,  0.5f,  0.5f,     1.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,     1.0f, 0.0f,
+                0.5f,  0.5f, -0.5f,     1.0f, 1.0f,
+
+                0.5f, -0.5f, -0.5f,     0.0f, 1.0f,
+                0.5f, -0.5f, -0.5f,     0.0f, 1.0f,
+                0.5f, -0.5f,  0.5f,     0.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,     1.0f, 0.0f,
+
+               -0.5f, -0.5f, -0.5f,     0.0f, 1.0f,
+                0.5f, -0.5f, -0.5f,     1.0f, 1.0f,
+                0.5f, -0.5f,  0.5f,     1.0f, 0.0f,
+                0.5f, -0.5f,  0.5f,     1.0f, 0.0f,
+
+               -0.5f, -0.5f,  0.5f,     0.0f, 0.0f,
+               -0.5f, -0.5f, -0.5f,     0.0f, 1.0f,
+               -0.5f,  0.5f, -0.5f,     0.0f, 1.0f,
+                0.5f,  0.5f, -0.5f,     1.0f, 1.0f,
+
+                0.5f,  0.5f,  0.5f,     1.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,     1.0f, 0.0f,
+               -0.5f,  0.5f,  0.5f,     0.0f, 0.0f,
+               -0.5f,  0.5f, -0.5f,     0.0f, 1.0f
         };
-        unsigned int indices[] = {
-                0, 1, 3,
-                1, 2, 3
+        gbVec3 cubepos[] = {
+                gb_vec3( 0.0f, 0.0f, 0.0f),
+                gb_vec3( 2.0f, 5.0f, -15.0f),
+                gb_vec3(-1.5f, -2.2f, -2.5f),
+                gb_vec3(-3.8f, -2.0f, -12.3f),
+                gb_vec3( 2.4f, -0.4f, -3.5f),
+                gb_vec3(-1.7f, 3.0f, -7.5f),
+                gb_vec3( 1.3f, -2.0f, -2.5f),
+                gb_vec3( 1.5f, 2.0f, -2.5f),
+                gb_vec3( 1.5f, 0.2f, -1.5f),
+                gb_vec3(-1.3f, 1.0f, -1.5f)
         };
+        int i;
         unsigned int vbo;
         unsigned int vao;
-        unsigned int ebo;
         unsigned int shader;
         unsigned int tex1;
         unsigned int tex2;
         gbMat4 model;
+        gbMat4 modrot;
+        gbMat4 modtrans;
         gbMat4 view;
         gbMat4 project;
+        float angle;
 
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -71,13 +122,9 @@ int main(void)
         tex2 = maketexture("assets/awesomeface.png");
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
-        glGenBuffers(1, &ebo);
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
-                     GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
                      GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                               (void *)0);
@@ -85,34 +132,36 @@ int main(void)
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                               (void *)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
+        glEnable(GL_DEPTH_TEST);
         glUseProgram(shader);
         glUniform1i(glGetUniformLocation(shader, "tex1"), 0);
         glUniform1i(glGetUniformLocation(shader, "tex2"), 1);
         while (!glfwWindowShouldClose(window)) {
-                gb_mat4_identity(&model);
-                gb_mat4_rotate(&model, gb_vec3(1.0f, 0.0f, 0.0f), gb_to_radians(-55.0f));
-                gb_mat4_identity(&view);
                 gb_mat4_translate(&view, gb_vec3(0.0f, 0.0f, -3.0f));
-                gb_mat4_identity(&project);
                 gb_mat4_perspective(&project, gb_to_radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-                glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, model.e);
                 glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, view.e);
                 glUniformMatrix4fv(glGetUniformLocation(shader, "project"), 1, GL_FALSE, project.e);
                 procinput(window);
                 glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, tex1);
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_2D, tex2);
                 glBindVertexArray(vao);
-                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+                for (i = 0; i < 10; i++) {
+                        angle = 20.0f * (float)i;
+                        gb_mat4_rotate(&modrot, gb_vec3(1.0f, 0.3f, 0.5f), gb_to_radians(angle));
+                        gb_mat4_translate(&modtrans, cubepos[i]);
+                        gb_mat4_mul(&model, &modtrans, &modrot);
+                        glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, model.e);
+                        glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
                 glfwSwapBuffers(window);
                 glfwPollEvents();
         }
         glDeleteVertexArrays(1, &vao);
         glDeleteBuffers(1, &vbo);
-        glDeleteBuffers(1, &ebo);
         glDeleteProgram(shader);
         glfwTerminate();
         return 0;
