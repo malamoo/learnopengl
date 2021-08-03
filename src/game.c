@@ -2,7 +2,7 @@
 #include "../external/glad.h"
 #include "../external/glfw.h"
 #include "../external/stb_image.h"
-#include "../external/hypatia.h"
+#include "../external/gb_math.h"
 #include "../include/shader.h"
 #include "../include/texture.h"
 
@@ -42,8 +42,9 @@ int main(void)
         unsigned int shader;
         unsigned int tex1;
         unsigned int tex2;
-        struct vector3 translate;
-        struct matrix4 transform;
+        gbMat4 model;
+        gbMat4 view;
+        gbMat4 project;
 
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -88,10 +89,15 @@ int main(void)
         glUniform1i(glGetUniformLocation(shader, "tex1"), 0);
         glUniform1i(glGetUniformLocation(shader, "tex2"), 1);
         while (!glfwWindowShouldClose(window)) {
-                matrix4_make_transformation_rotationf_z(&transform, (float)glfwGetTime());
-                vector3_setf3(&translate, 0.5f, -0.5f, 0.0f);
-                matrix4_translatev3(&transform, &translate);
-                glUniformMatrix4fv(glGetUniformLocation(shader, "transform"), 1, GL_TRUE, transform.m);
+                gb_mat4_identity(&model);
+                gb_mat4_rotate(&model, gb_vec3(1.0f, 0.0f, 0.0f), gb_to_radians(-55.0f));
+                gb_mat4_identity(&view);
+                gb_mat4_translate(&view, gb_vec3(0.0f, 0.0f, -3.0f));
+                gb_mat4_identity(&project);
+                gb_mat4_perspective(&project, gb_to_radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+                glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, model.e);
+                glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, view.e);
+                glUniformMatrix4fv(glGetUniformLocation(shader, "project"), 1, GL_FALSE, project.e);
                 procinput(window);
                 glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);

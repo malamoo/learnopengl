@@ -5,7 +5,7 @@ GLFW_CFLAGS = -w
 GLFW_DEFS = -DLSH_GLFW_IMPLEMENTATION 
 GLAD_CFLAGS = -w
 STB_CFLAGS = -w
-HYP_CFLAGS = -w
+GB_CFLAGS = -w
 
 UNAME_S = $(shell uname -s)
 ifeq ($(UNAME_S), Linux)
@@ -24,7 +24,7 @@ all: mkdir bin/game
 mkdir:
 	mkdir -p build bin
 
-bin/game: build/glfw.o build/glad.o build/stb_image.o build/hypatia.o \
+bin/game: build/glfw.o build/glad.o build/stb_image.o build/gb_math.o \
 		  build/shader.o build/texture.o build/game.o
 	cc $(GLFW_FWS) -o $@ $^ $(LIBS)
 
@@ -37,8 +37,8 @@ build/glad.o: external/glad.c
 build/stb_image.o: external/stb_image.c
 	cc $(STB_CFLAGS) -c $^ -o $@
 
-build/hypatia.o: external/hypatia.c
-	cc $(HYP_CFLAGS) -c $^ -o $@
+build/gb_math.o: external/gb_math.c
+	cc $(GB_CFLAGS) -c $^ -o $@
 
 build/texture.o: src/texture.c
 	cc $(CFLAGS) -c $^ -o $@
