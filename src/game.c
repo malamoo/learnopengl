@@ -6,6 +6,10 @@
 #include "../include/shader.h"
 #include "../include/texture.h"
 
+gbVec3 eye;
+gbVec3 front;
+gbVec3 up;
+
 void resize(GLFWwindow *window, int width, int height);
 void procinput(GLFWwindow *window);
 
@@ -18,8 +22,32 @@ void resize(GLFWwindow *window, int width, int height)
 /* Processes the window input. */
 void procinput(GLFWwindow *window)
 {
+        float speed = 0.05f;
+        gbVec3 delta;
+        gbVec3 right;
+
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
                 glfwSetWindowShouldClose(window, 1);
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+                gb_vec3_mul(&delta, front, speed);
+                gb_vec3_add(&eye, eye, delta);
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+                gb_vec3_mul(&delta, front, speed);
+                gb_vec3_sub(&eye, eye, delta);
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+                gb_vec3_cross(&right, front, up);
+                gb_vec3_norm(&right, right);
+                gb_vec3_mul(&delta, right, speed);
+                gb_vec3_sub(&eye, eye, delta);
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+                gb_vec3_cross(&right, front, up);
+                gb_vec3_norm(&right, right);
+                gb_vec3_mul(&delta, right, speed);
+                gb_vec3_add(&eye, eye, delta);
+        }
 }
 
 int main(void)
@@ -91,10 +119,11 @@ int main(void)
         unsigned int tex1;
         unsigned int tex2;
         gbMat4 model;
-        gbMat4 modrot;
-        gbMat4 modtrans;
+        gbMat4 rotate;
+        gbMat4 trans;
         gbMat4 view;
         gbMat4 project;
+        gbVec3 centre;
         float angle;
 
         glfwInit();
@@ -104,7 +133,7 @@ int main(void)
 #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-        window = glfwCreateWindow(800, 600, "Game", NULL, NULL);
+        window = glfwCreateWindow(1200, 900, "Game", NULL, NULL);
         if (window == NULL) {
                 printf("Error: failed to create GLFW window\n");
                 glfwTerminate();
@@ -115,7 +144,7 @@ int main(void)
                 printf("Failed to initialize GLAD\n");
                 return -1;
         }
-        glViewport(0, 0, 800, 600);
+        glViewport(0, 0, 1200, 900);
         glfwSetFramebufferSizeCallback(window, resize);
         shader = makeshader("src/vshader.glsl", "src/fshader.glsl");
         tex1 = maketexture("assets/container.jpeg");
@@ -136,9 +165,13 @@ int main(void)
         glUseProgram(shader);
         glUniform1i(glGetUniformLocation(shader, "tex1"), 0);
         glUniform1i(glGetUniformLocation(shader, "tex2"), 1);
+        eye = gb_vec3(0.0f, 0.0f, 3.0f);
+        front = gb_vec3(0.0f, 0.0f, -1.0f);
+        up = gb_vec3(0.0f, 1.0f, 0.0f);
         while (!glfwWindowShouldClose(window)) {
-                gb_mat4_translate(&view, gb_vec3(0.0f, 0.0f, -3.0f));
-                gb_mat4_perspective(&project, gb_to_radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+                gb_vec3_add(&centre, eye, front);
+                gb_mat4_look_at(&view, eye, centre, up);
+                gb_mat4_perspective(&project, gb_to_radians(45.0f), 1200.0f / 900.0f, 0.1f, 100.0f);
                 glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, view.e);
                 glUniformMatrix4fv(glGetUniformLocation(shader, "project"), 1, GL_FALSE, project.e);
                 procinput(window);
@@ -150,10 +183,13 @@ int main(void)
                 glBindTexture(GL_TEXTURE_2D, tex2);
                 glBindVertexArray(vao);
                 for (i = 0; i < 10; i++) {
-                        angle = 20.0f * (float)i;
-                        gb_mat4_rotate(&modrot, gb_vec3(1.0f, 0.3f, 0.5f), gb_to_radians(angle));
-                        gb_mat4_translate(&modtrans, cubepos[i]);
-                        gb_mat4_mul(&model, &modtrans, &modrot);
+                        gb_mat4_identity(&rotate);
+                        if (i % 3 == 0) {
+                                angle = 20.0f * (float)glfwGetTime();
+                                gb_mat4_rotate(&rotate, gb_vec3(1.0f, 0.3f, 0.5f), gb_to_radians(angle));
+                        }
+                        gb_mat4_translate(&trans, cubepos[i]);
+                        gb_mat4_mul(&model, &trans, &rotate);
                         glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, model.e);
                         glDrawArrays(GL_TRIANGLES, 0, 36);
                 }
