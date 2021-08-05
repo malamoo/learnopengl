@@ -9,9 +9,18 @@
 gbVec3 eye;
 gbVec3 front;
 gbVec3 up;
+float deltatime;
+float lastframe;
+float yaw;
+float pitch;
+float lastx;
+float lasty;
+float fov;
+int firstmouse;
 
 void resize(GLFWwindow *window, int width, int height);
 void procinput(GLFWwindow *window);
+void updatecam(GLFWwindow* window, double xpos, double ypos);
 
 /* Resizes the OpenGL viewport when the window dimensions change. */
 void resize(GLFWwindow *window, int width, int height)
@@ -22,32 +31,76 @@ void resize(GLFWwindow *window, int width, int height)
 /* Processes the window input. */
 void procinput(GLFWwindow *window)
 {
-        float speed = 0.05f;
-        gbVec3 delta;
+        float speed = 5.0f * deltatime;
+        gbVec3 deltapos;
         gbVec3 right;
 
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
                 glfwSetWindowShouldClose(window, 1);
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-                gb_vec3_mul(&delta, front, speed);
-                gb_vec3_add(&eye, eye, delta);
+                gb_vec3_mul(&deltapos, front, speed);
+                gb_vec3_add(&eye, eye, deltapos);
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-                gb_vec3_mul(&delta, front, speed);
-                gb_vec3_sub(&eye, eye, delta);
+                gb_vec3_mul(&deltapos, front, speed);
+                gb_vec3_sub(&eye, eye, deltapos);
         }
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
                 gb_vec3_cross(&right, front, up);
                 gb_vec3_norm(&right, right);
-                gb_vec3_mul(&delta, right, speed);
-                gb_vec3_sub(&eye, eye, delta);
+                gb_vec3_mul(&deltapos, right, speed);
+                gb_vec3_sub(&eye, eye, deltapos);
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
                 gb_vec3_cross(&right, front, up);
                 gb_vec3_norm(&right, right);
-                gb_vec3_mul(&delta, right, speed);
-                gb_vec3_add(&eye, eye, delta);
+                gb_vec3_mul(&deltapos, right, speed);
+                gb_vec3_add(&eye, eye, deltapos);
         }
+}
+
+/* Updates the camera position by using the cursor offset. */
+void updatecam(GLFWwindow* window, double xpos, double ypos)
+{
+        float xoff;
+        float yoff;
+        float sensitivity;
+        gbVec3 direction;
+
+        if (firstmouse)
+        {
+                lastx = (float)xpos;
+                lasty = (float)ypos;
+                firstmouse = 0;
+        }
+        xoff = (float)xpos - lastx;
+        yoff = lasty - (float)ypos;
+        lastx = (float)xpos;
+        lasty = (float)ypos;
+        sensitivity = 0.1f;
+        xoff *= sensitivity;
+        yoff *= sensitivity;
+        yaw += xoff;
+        pitch += yoff;
+        if(pitch > 89.0f)
+                pitch = 89.0f;
+        if(pitch < -89.0f)
+                pitch = -89.0f;
+        direction.x = gb_cos(gb_to_radians(yaw)) * gb_cos(gb_to_radians(pitch));
+        direction.y = gb_sin(gb_to_radians(pitch));
+        direction.z = gb_sin(gb_to_radians(yaw)) * gb_cos(gb_to_radians(pitch));
+        gb_vec3_norm(&direction, direction);
+        front = direction;
+}
+
+/* Updates the FOV by using the scroll offset. */
+void updatefov(GLFWwindow* window, double xoff, double yoff)
+{
+        fov -= (float)yoff;
+        if (fov < 1.0f)
+                fov = 1.0f;
+        if (fov > 45.0f)
+                fov = 45.0f;
 }
 
 int main(void)
@@ -125,6 +178,7 @@ int main(void)
         gbMat4 project;
         gbVec3 centre;
         float angle;
+        float currframe;
 
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -133,7 +187,7 @@ int main(void)
 #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-        window = glfwCreateWindow(1200, 900, "Game", NULL, NULL);
+        window = glfwCreateWindow(800, 600, "Game", NULL, NULL);
         if (window == NULL) {
                 printf("Error: failed to create GLFW window\n");
                 glfwTerminate();
@@ -144,8 +198,11 @@ int main(void)
                 printf("Failed to initialize GLAD\n");
                 return -1;
         }
-        glViewport(0, 0, 1200, 900);
+        glViewport(0, 0, 800, 600);
         glfwSetFramebufferSizeCallback(window, resize);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPosCallback(window, updatecam);
+        glfwSetScrollCallback(window, updatefov);
         shader = makeshader("src/vshader.glsl", "src/fshader.glsl");
         tex1 = maketexture("assets/container.jpeg");
         tex2 = maketexture("assets/awesomeface.png");
@@ -168,12 +225,20 @@ int main(void)
         eye = gb_vec3(0.0f, 0.0f, 3.0f);
         front = gb_vec3(0.0f, 0.0f, -1.0f);
         up = gb_vec3(0.0f, 1.0f, 0.0f);
+        yaw = -90.0f;
+        pitch = 0.0f;
+        lastx = 400;
+        lasty = 300;
+        fov = 45.0f;
         while (!glfwWindowShouldClose(window)) {
                 gb_vec3_add(&centre, eye, front);
                 gb_mat4_look_at(&view, eye, centre, up);
-                gb_mat4_perspective(&project, gb_to_radians(45.0f), 1200.0f / 900.0f, 0.1f, 100.0f);
+                gb_mat4_perspective(&project, gb_to_radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
                 glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, view.e);
                 glUniformMatrix4fv(glGetUniformLocation(shader, "project"), 1, GL_FALSE, project.e);
+                currframe = (float)glfwGetTime();
+                deltatime = currframe - lastframe;
+                lastframe = currframe;
                 procinput(window);
                 glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
