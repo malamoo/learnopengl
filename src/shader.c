@@ -10,26 +10,26 @@ char *freadstr(char *name);
 /* Returns the number of bytes in a file. */
 long cntbytes(FILE *fp)
 {
-        long cnt;
+        long count;
 
         fseek(fp, 0, SEEK_END);
-        cnt = ftell(fp);
+        count = ftell(fp);
         rewind(fp);
-        return cnt;
+        return count;
 }
 
 /* Returns a file's characters as a string. */
 char *freadstr(char *name)
 {
         FILE *fp;
-        long cnt;
+        long count;
         char *str;
 
         fp = fopen(name, "r");
-        cnt = cntbytes(fp);
-        str = calloc(cnt + 1, sizeof(char));
-        str[cnt] = '\0';
-        fread(str, sizeof(char), cnt, fp);
+        count = cntbytes(fp);
+        str = calloc(count + 1, sizeof(char));
+        str[count] = '\0';
+        fread(str, sizeof(char), count, fp);
         fclose(fp);
         return str;
 }
@@ -38,7 +38,7 @@ char *freadstr(char *name)
  * Makes an OpenGL shader program with the specified vertex and fragment
  * shaders.
  */
-unsigned int makeshader(char *vsname, char *fsname)
+unsigned int make_shader(char *vsname, char *fsname)
 {
         unsigned int vshader;
         unsigned int fshader;

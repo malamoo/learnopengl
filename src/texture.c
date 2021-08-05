@@ -3,7 +3,7 @@
 #include "../include/texture.h"
 
 /* Makes a texture from the specified image file. */
-unsigned int maketexture(char *name)
+unsigned int make_texture(char *name)
 {
         unsigned int texture;
         unsigned char *data;

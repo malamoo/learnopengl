@@ -1,1 +1,1 @@
-unsigned int maketexture(char *name);
+unsigned int make_texture(char *name);
