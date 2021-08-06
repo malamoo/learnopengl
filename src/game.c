@@ -62,6 +62,7 @@ void mouse_callback(GLFWwindow *window, double x_pos, double y_pos)
                 first_mouse = 0;
         }
         x_off = (float)x_pos - last_x;
+        /* reversed because y-coordinates range from bottom to top */
         y_off = last_y - (float)y_pos;
         last_x = (float)x_pos;
         last_y = (float)y_pos;
@@ -78,7 +79,7 @@ int main(void)
 {
         GLFWwindow *window;
         float vertices[] = {
-                /* positions         texture coordinates */
+             /* positions */      /* texture coordinates */
                -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
                 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
                 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -139,9 +140,9 @@ int main(void)
         int i;
         unsigned int vbo;
         unsigned int vao;
-        unsigned int shader;
         unsigned int tex1;
         unsigned int tex2;
+        Shader shader;
         gbMat4 model;
         gbMat4 rotate;
         gbMat4 translate;
@@ -172,7 +173,7 @@ int main(void)
         glfwSetCursorPosCallback(window, mouse_callback);
         glfwSetScrollCallback(window, scroll_callback);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        shader = make_shader("src/vshader.glsl", "src/fshader.glsl");
+        shader_init(&shader, "src/vertex.glsl", "src/fragment.glsl");
         tex1 = make_texture("assets/container.jpeg");
         tex2 = make_texture("assets/awesomeface.png");
         glEnable(GL_DEPTH_TEST);
@@ -188,9 +189,9 @@ int main(void)
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                               (void *)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
-        glUseProgram(shader);
-        glUniform1i(glGetUniformLocation(shader, "tex1"), 0);
-        glUniform1i(glGetUniformLocation(shader, "tex2"), 1);
+        shader_use(&shader);
+        shader_load_int(&shader, "tex1", 0);
+        shader_load_int(&shader, "tex2", 1);
         camera_init(&camera, gb_vec3(0.0f, 0.0f, 3.0f),
                     gb_vec3(0.0f, 1.0f, 0.0f), YAW, PITCH);
         while (!glfwWindowShouldClose(window)) {
@@ -207,11 +208,9 @@ int main(void)
                 gb_mat4_perspective(&projection, gb_to_radians(camera.zoom),
                                     (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f,
                                     100.0f);
-                glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1,
-                                   GL_FALSE, projection.e);
+                shader_load_mat4(&shader, "projection", &projection);
                 camera_calc_view(&view, &camera);
-                glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1,
-                                   GL_FALSE, view.e);
+                shader_load_mat4(&shader, "view", &view);
                 glBindVertexArray(vao);
                 for (i = 0; i < 10; i++) {
                         gb_mat4_identity(&rotate);
@@ -221,9 +220,7 @@ int main(void)
                                        gb_to_radians(angle));
                         gb_mat4_translate(&translate, cube_positions[i]);
                         gb_mat4_mul(&model, &translate, &rotate);
-                        glUniformMatrix4fv(
-                                glGetUniformLocation(shader, "model"), 1,
-                                GL_FALSE, model.e);
+                        shader_load_mat4(&shader, "model", &model);
                         glDrawArrays(GL_TRIANGLES, 0, 36);
                 }
                 glfwSwapBuffers(window);
@@ -231,7 +228,6 @@ int main(void)
         }
         glDeleteVertexArrays(1, &vao);
         glDeleteBuffers(1, &vbo);
-        glDeleteProgram(shader);
         glfwTerminate();
         return 0;
 }
