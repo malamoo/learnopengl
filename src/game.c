@@ -79,76 +79,60 @@ int main(void)
 {
         GLFWwindow *window;
         float vertices[] = {
-             /* positions */      /* texture coordinates */
-               -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-                0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f,
+                 0.5f, -0.5f, -0.5f,
+                 0.5f,  0.5f, -0.5f,
+                 0.5f,  0.5f, -0.5f,
+                -0.5f,  0.5f, -0.5f,
+                -0.5f, -0.5f, -0.5f,
 
-               -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-               -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-               -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                -0.5f, -0.5f,  0.5f,
+                 0.5f, -0.5f,  0.5f,
+                 0.5f,  0.5f,  0.5f,
+                 0.5f,  0.5f,  0.5f,
+                -0.5f,  0.5f,  0.5f,
+                -0.5f, -0.5f,  0.5f,
 
-                0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-                0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-               -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-               -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                -0.5f,  0.5f,  0.5f,
+                -0.5f,  0.5f, -0.5f,
+                -0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f,  0.5f,
+                -0.5f,  0.5f,  0.5f,
 
-               -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-               -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-               -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-               -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                 0.5f,  0.5f,  0.5f,
+                 0.5f,  0.5f, -0.5f,
+                 0.5f, -0.5f, -0.5f,
+                 0.5f, -0.5f, -0.5f,
+                 0.5f, -0.5f,  0.5f,
+                 0.5f,  0.5f,  0.5f,
 
-               -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-               -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f,
+                 0.5f, -0.5f, -0.5f,
+                 0.5f, -0.5f,  0.5f,
+                 0.5f, -0.5f,  0.5f,
+                -0.5f, -0.5f,  0.5f,
+                -0.5f, -0.5f, -0.5f,
 
-                0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-               -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-                0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-
-               -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-               -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-               -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-
-                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-               -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-               -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+                -0.5f,  0.5f, -0.5f,
+                 0.5f,  0.5f, -0.5f,
+                 0.5f,  0.5f,  0.5f,
+                 0.5f,  0.5f,  0.5f,
+                -0.5f,  0.5f,  0.5f,
+                -0.5f,  0.5f, -0.5f
         };
-        gbVec3 cube_positions[] = {
-                gb_vec3(0.0f, 0.0f, 0.0f),
-                gb_vec3(2.0f, 5.0f, -15.0f),
-                gb_vec3(-1.5f, -2.2f, -2.5f),
-                gb_vec3(-3.8f, -2.0f, -12.3f),
-                gb_vec3(2.4f, -0.4f, -3.5f),
-                gb_vec3(-1.7f, 3.0f, -7.5f),
-                gb_vec3(1.3f, -2.0f, -2.5f),
-                gb_vec3(1.5f, 2.0f, -2.5f),
-                gb_vec3(1.5f, 0.2f, -1.5f),
-                gb_vec3(-1.3f, 1.0f, -1.5f)
-        };
-        int i;
         unsigned int vbo;
         unsigned int vao;
-        unsigned int tex1;
-        unsigned int tex2;
+        unsigned int lighting_vao;
         Shader shader;
+        Shader lighting_shader;
+        gbVec3 object_color;
+        gbVec3 light_color;
         gbMat4 model;
-        gbMat4 rotate;
-        gbMat4 translate;
         gbMat4 view;
         gbMat4 projection;
-        float angle;
+        gbMat4 translate;
+        gbMat4 scale;
         float curr_frame;
 
         glfwInit();
@@ -174,24 +158,24 @@ int main(void)
         glfwSetScrollCallback(window, scroll_callback);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         shader_init(&shader, "src/vertex.glsl", "src/fragment.glsl");
-        tex1 = make_texture("assets/container.jpeg");
-        tex2 = make_texture("assets/awesomeface.png");
+        shader_init(&lighting_shader, "src/vertex.glsl", "src/lighting.glsl");
         glEnable(GL_DEPTH_TEST);
-        glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
-        glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
                      GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
                               (void *)0);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                              (void *)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-        shader_use(&shader);
-        shader_load_int(&shader, "tex1", 0);
-        shader_load_int(&shader, "tex2", 1);
+        glGenVertexArrays(1, &lighting_vao);
+        glBindVertexArray(lighting_vao);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+                              (void *)0);
+        glEnableVertexAttribArray(0);
+        object_color = gb_vec3(1.0f, 0.5f, 0.31f);
+        light_color = gb_vec3(1.0f, 1.0f, 1.0f);
         camera_init(&camera, gb_vec3(0.0f, 0.0f, 3.0f),
                     gb_vec3(0.0f, 1.0f, 0.0f), YAW, PITCH);
         while (!glfwWindowShouldClose(window)) {
@@ -199,30 +183,30 @@ int main(void)
                 delta_time = curr_frame - last_frame;
                 last_frame = curr_frame;
                 process_input(window);
-                glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+                glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, tex1);
-                glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, tex2);
+                shader_use(&shader);
+                shader_load_vec3(&shader, "object_color", &object_color);
+                shader_load_vec3(&shader, "light_color", &light_color);
+                gb_mat4_identity(&model);
+                camera_calc_view(&view, &camera);
                 gb_mat4_perspective(&projection, gb_to_radians(camera.zoom),
                                     (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f,
                                     100.0f);
-                shader_load_mat4(&shader, "projection", &projection);
-                camera_calc_view(&view, &camera);
+                shader_load_mat4(&shader, "model", &model);
                 shader_load_mat4(&shader, "view", &view);
+                shader_load_mat4(&shader, "projection", &projection);
                 glBindVertexArray(vao);
-                for (i = 0; i < 10; i++) {
-                        gb_mat4_identity(&rotate);
-                        angle = 20.0f * (float)i;
-                        gb_mat4_rotate(&rotate,
-                                       gb_vec3(1.0f, 0.3f, 0.5f),
-                                       gb_to_radians(angle));
-                        gb_mat4_translate(&translate, cube_positions[i]);
-                        gb_mat4_mul(&model, &translate, &rotate);
-                        shader_load_mat4(&shader, "model", &model);
-                        glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+                shader_use(&lighting_shader);
+                gb_mat4_translate(&translate, gb_vec3(1.2f, 1.0f, 2.0f));
+                gb_mat4_scale(&scale, gb_vec3(0.2f, 0.2f, 0.2f));
+                gb_mat4_mul(&model, &translate, &scale);
+                shader_load_mat4(&lighting_shader, "model", &model);
+                shader_load_mat4(&lighting_shader, "view", &view);
+                shader_load_mat4(&lighting_shader, "projection", &projection);
+                glBindVertexArray(lighting_vao);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
                 glfwSwapBuffers(window);
                 glfwPollEvents();
         }
