@@ -50,45 +50,45 @@ void shader_use(Shader *shader)
         glUseProgram(shader->id);
 }
 
-/* Sets the named uniform to the specified value in the shader program. */
-void shader_load_int(Shader *shader, const char *name, int value)
+/* Assigns a value to the named uniform in the shader program. */
+void shader_assign_int(Shader *shader, const char *name, int value)
 {
         glUniform1i(glGetUniformLocation(shader->id, name), value);
 }
 
-void shader_load_float(Shader *shader, const char *name, float value)
+void shader_assign_float(Shader *shader, const char *name, float value)
 {
         glUniform1f(glGetUniformLocation(shader->id, name), value);
 }
 
-void shader_load_vec2(Shader *shader, const char *name, vec2 value)
+void shader_assign_vec2(Shader *shader, const char *name, vec2 value)
 {
         glUniform2fv(glGetUniformLocation(shader->id, name), 1, value);
 }
 
-void shader_load_vec3(Shader *shader, const char *name, vec3 value)
+void shader_assign_vec3(Shader *shader, const char *name, vec3 value)
 {
         glUniform3fv(glGetUniformLocation(shader->id, name), 1, value);
 }
 
-void shader_load_vec4(Shader *shader, const char *name, vec4 value)
+void shader_assign_vec4(Shader *shader, const char *name, vec4 value)
 {
         glUniform4fv(glGetUniformLocation(shader->id, name), 1, value);
 }
 
-void shader_load_mat2(Shader *shader, const char *name, mat2 value)
+void shader_assign_mat2(Shader *shader, const char *name, mat2 value)
 {
         glUniformMatrix2fv(glGetUniformLocation(shader->id, name), 1, GL_FALSE,
                            (float *)value);
 }
 
-void shader_load_mat3(Shader *shader, const char *name, mat3 value)
+void shader_assign_mat3(Shader *shader, const char *name, mat3 value)
 {
         glUniformMatrix3fv(glGetUniformLocation(shader->id, name), 1, GL_FALSE,
                            (float *)value);
 }
 
-void shader_load_mat4(Shader *shader, const char *name, mat4 value)
+void shader_assign_mat4(Shader *shader, const char *name, mat4 value)
 {
         glUniformMatrix4fv(glGetUniformLocation(shader->id, name), 1, GL_FALSE,
                            (float *)value);

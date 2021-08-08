@@ -192,27 +192,27 @@ int main(void)
                 glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 shader_use(&lighting_shader);
-                shader_load_vec3(&lighting_shader, "cube_color", cube_color);
-                shader_load_vec3(&lighting_shader, "lamp_color", lamp_color);
-                shader_load_vec3(&lighting_shader, "lamp_pos", lamp_pos);
-                shader_load_vec3(&lighting_shader, "view_pos", camera.pos);
+                shader_assign_vec3(&lighting_shader, "cube_color", cube_color);
+                shader_assign_vec3(&lighting_shader, "lamp_color", lamp_color);
+                shader_assign_vec3(&lighting_shader, "lamp_pos", lamp_pos);
+                shader_assign_vec3(&lighting_shader, "view_pos", camera.pos);
                 glm_mat4_identity(model);
                 camera_calc_view(&camera, view);
                 glm_perspective(glm_rad(camera.zoom),
                                 (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f,
                                 100.0f, projection);
-                shader_load_mat4(&lighting_shader, "model", model);
-                shader_load_mat4(&lighting_shader, "view", view);
-                shader_load_mat4(&lighting_shader, "projection", projection);
+                shader_assign_mat4(&lighting_shader, "model", model);
+                shader_assign_mat4(&lighting_shader, "view", view);
+                shader_assign_mat4(&lighting_shader, "projection", projection);
                 glBindVertexArray(cube_vao);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
                 shader_use(&lamp_shader);
                 glm_mat4_identity(model);
                 glm_translate(model, lamp_pos);
                 glm_scale(model, (vec3){ 0.2f, 0.2f, 0.2f });
-                shader_load_mat4(&lamp_shader, "model", model);
-                shader_load_mat4(&lamp_shader, "view", view);
-                shader_load_mat4(&lamp_shader, "projection", projection);
+                shader_assign_mat4(&lamp_shader, "model", model);
+                shader_assign_mat4(&lamp_shader, "view", view);
+                shader_assign_mat4(&lamp_shader, "projection", projection);
                 glBindVertexArray(lamp_vao);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
                 glfwSwapBuffers(window);
