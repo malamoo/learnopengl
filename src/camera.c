@@ -1,3 +1,4 @@
+#include "../external/cglm/cglm.h"
 #include "../include/camera.h"
 
 const float SPEED = 2.5f;
@@ -8,13 +9,13 @@ void camera_update_vectors(Camera *camera);
 
 /* Initializes a camera with the specified configuration. */
 void
-camera_init(Camera *camera, gbVec3 position, gbVec3 up, float yaw, float pitch)
+camera_init(Camera *camera, vec3 position, vec3 up, float yaw, float pitch)
 {
-        camera->pos = position;
-        camera->world_up = up;
+        glm_vec3(position, camera->pos);
+        glm_vec3(up, camera->world_up);
         camera->yaw = yaw;
         camera->pitch = pitch;
-        camera->front = gb_vec3(0.0f, 0.0f, -1.0f);
+        glm_vec3((vec3){ 0.0f, 0.0f, -1.0f }, camera->front);
         camera->move_speed = SPEED;
         camera->sensitivity = SENSITIVITY;
         camera->zoom = ZOOM;
@@ -25,35 +26,35 @@ camera_init(Camera *camera, gbVec3 position, gbVec3 up, float yaw, float pitch)
  * Returns the view matrix calculated using
  * Euler Angles and the "Look-At" Matrix.
  */
-void camera_calc_view(gbMat4 *view, Camera *camera)
+void camera_calc_view(Camera *camera, mat4 view)
 {
-        gbVec3 centre;
+        vec3 centre;
 
-        gb_vec3_add(&centre, camera->pos, camera->front);
-        gb_mat4_look_at(view, camera->pos, centre, camera->up);
+        glm_vec3_add(camera->pos, camera->front, centre);
+        glm_lookat(camera->pos, centre, camera->up, view);
 }
 
 /* Processes input received from any keyboard-like input system. */
 void camera_proc_kb(Camera *camera, CameraMove camera_move, float delta_time)
 {
         float velocity = camera->move_speed * delta_time;
-        gbVec3 delta_pos;
+        vec3 delta_pos;
 
         if (camera_move == FORWARD) {
-                gb_vec3_mul(&delta_pos, camera->front, velocity);
-                gb_vec3_add(&camera->pos, camera->pos, delta_pos);
+                glm_vec3_scale(camera->front, velocity, delta_pos);
+                glm_vec3_add(camera->pos, delta_pos, camera->pos);
         }
         if (camera_move == BACKWARD) {
-                gb_vec3_mul(&delta_pos, camera->front, velocity);
-                gb_vec3_sub(&camera->pos, camera->pos, delta_pos);
+                glm_vec3_scale(camera->front, velocity, delta_pos);
+                glm_vec3_sub(camera->pos, delta_pos, camera->pos);
         }
         if (camera_move == LEFT) {
-                gb_vec3_mul(&delta_pos, camera->right, velocity);
-                gb_vec3_sub(&camera->pos, camera->pos, delta_pos);
+                glm_vec3_scale(camera->right, velocity, delta_pos);
+                glm_vec3_sub(camera->pos, delta_pos, camera->pos);
         }
         if (camera_move == RIGHT) {
-                gb_vec3_mul(&delta_pos, camera->right, velocity);
-                gb_vec3_add(&camera->pos, camera->pos, delta_pos);
+                glm_vec3_scale(camera->right, velocity, delta_pos);
+                glm_vec3_add(camera->pos, delta_pos, camera->pos);
         }
 }
 
@@ -92,18 +93,18 @@ void camera_proc_mouse(Camera *camera, float x_off, float y_off, int bounded)
 /* Calculates the camera's vectors from the its (updated) Euler Angles. */
 void camera_update_vectors(Camera *camera)
 {
-        gbVec3 front;
+        float x;
+        float y;
+        float z;
 
-        front.x = gb_cos(gb_to_radians(camera->yaw)) *
-                  gb_cos(gb_to_radians(camera->pitch));
-        front.y = gb_sin(gb_to_radians(camera->pitch));
-        front.z = gb_sin(gb_to_radians(camera->yaw)) *
-                  gb_cos(gb_to_radians(camera->pitch));
-        gb_vec3_norm(&front, front);
-        camera->front = front;
-        gb_vec3_cross(&camera->right, camera->front, camera->world_up);
-        gb_vec3_norm(&camera->right, camera->right);
-        gb_vec3_cross(&camera->up, camera->right, camera->front);
-        gb_vec3_norm(&camera->up, camera->up);
+        x = cosf(glm_rad(camera->yaw)) * cosf(glm_rad(camera->pitch));
+        y = sinf(glm_rad(camera->pitch));
+        z = sinf(glm_rad(camera->yaw)) * cosf(glm_rad(camera->pitch));
+        glm_vec3((vec3){ x, y, z }, camera->front);
+        glm_normalize(camera->front);
+        glm_cross(camera->front, camera->world_up, camera->right);
+        glm_normalize(camera->right);
+        glm_cross(camera->right, camera->front, camera->up);
+        glm_normalize(camera->up);
 }
 

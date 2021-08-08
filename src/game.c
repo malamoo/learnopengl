@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "../external/glad.h"
-#include "../external/glfw.h"
-#include "../external/gb_math.h"
+#include "../external/glad/glad.h"
+#include "../external/glfw/glfw.h"
+#include "../external/cglm/cglm.h"
 #include "../include/shader.h"
 #include "../include/texture.h"
 #include "../include/camera.h"
@@ -21,6 +21,9 @@ int first_mouse = 1;
 /* Timing globals */
 float delta_time = 0.0f;
 float last_frame = 0.0f;
+
+/* Lighting globals */
+vec3 lamp_pos = (vec3){ 1.2f, 1.0f, 2.0f };
 
 void process_input(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -79,60 +82,59 @@ int main(void)
 {
         GLFWwindow *window;
         float vertices[] = {
-                -0.5f, -0.5f, -0.5f,
-                 0.5f, -0.5f, -0.5f,
-                 0.5f,  0.5f, -0.5f,
-                 0.5f,  0.5f, -0.5f,
-                -0.5f,  0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
+                /* vertices       */  /* normals       */
+                -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+                 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+                 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+                 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+                -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-                -0.5f, -0.5f,  0.5f,
-                 0.5f, -0.5f,  0.5f,
-                 0.5f,  0.5f,  0.5f,
-                 0.5f,  0.5f,  0.5f,
-                -0.5f,  0.5f,  0.5f,
-                -0.5f, -0.5f,  0.5f,
+                -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+                 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+                 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+                 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+                -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+                -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
 
-                -0.5f,  0.5f,  0.5f,
-                -0.5f,  0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-                -0.5f, -0.5f,  0.5f,
-                -0.5f,  0.5f,  0.5f,
+                -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+                -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+                -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+                -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+                -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+                -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-                 0.5f,  0.5f,  0.5f,
-                 0.5f,  0.5f, -0.5f,
-                 0.5f, -0.5f, -0.5f,
-                 0.5f, -0.5f, -0.5f,
-                 0.5f, -0.5f,  0.5f,
-                 0.5f,  0.5f,  0.5f,
+                 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+                 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+                 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+                 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+                 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+                 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-                -0.5f, -0.5f, -0.5f,
-                 0.5f, -0.5f, -0.5f,
-                 0.5f, -0.5f,  0.5f,
-                 0.5f, -0.5f,  0.5f,
-                -0.5f, -0.5f,  0.5f,
-                -0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+                 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+                 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+                 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+                -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-                -0.5f,  0.5f, -0.5f,
-                 0.5f,  0.5f, -0.5f,
-                 0.5f,  0.5f,  0.5f,
-                 0.5f,  0.5f,  0.5f,
-                -0.5f,  0.5f,  0.5f,
-                -0.5f,  0.5f, -0.5f
+                -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+                 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+                 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+                 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+                -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+                -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
         };
         unsigned int vbo;
-        unsigned int vao;
-        unsigned int lighting_vao;
-        Shader shader;
+        unsigned int cube_vao;
+        unsigned int lamp_vao;
         Shader lighting_shader;
-        gbVec3 object_color;
-        gbVec3 light_color;
-        gbMat4 model;
-        gbMat4 view;
-        gbMat4 projection;
-        gbMat4 translate;
-        gbMat4 scale;
+        Shader lamp_shader;
+        vec3 cube_color;
+        vec3 lamp_color;
+        mat4 model;
+        mat4 view;
+        mat4 projection;
         float curr_frame;
 
         glfwInit();
@@ -157,27 +159,30 @@ int main(void)
         glfwSetCursorPosCallback(window, mouse_callback);
         glfwSetScrollCallback(window, scroll_callback);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        shader_init(&shader, "src/vertex.glsl", "src/fragment.glsl");
-        shader_init(&lighting_shader, "src/vertex.glsl", "src/lighting.glsl");
+        shader_init(&lighting_shader, "src/lighting.vert", "src/lighting.frag");
+        shader_init(&lamp_shader, "src/lamp.vert", "src/lamp.frag");
         glEnable(GL_DEPTH_TEST);
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
                      GL_STATIC_DRAW);
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+        glGenVertexArrays(1, &cube_vao);
+        glBindVertexArray(cube_vao);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                              (void *)0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                              (void *)(3 * sizeof(float)));
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glGenVertexArrays(1, &lamp_vao);
+        glBindVertexArray(lamp_vao);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
                               (void *)0);
         glEnableVertexAttribArray(0);
-        glGenVertexArrays(1, &lighting_vao);
-        glBindVertexArray(lighting_vao);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-                              (void *)0);
-        glEnableVertexAttribArray(0);
-        object_color = gb_vec3(1.0f, 0.5f, 0.31f);
-        light_color = gb_vec3(1.0f, 1.0f, 1.0f);
-        camera_init(&camera, gb_vec3(0.0f, 0.0f, 3.0f),
-                    gb_vec3(0.0f, 1.0f, 0.0f), YAW, PITCH);
+        glm_vec3((vec3){1.0f, 0.5f, 0.31f}, cube_color);
+        glm_vec3((vec3){1.0f, 1.0f, 1.0f}, lamp_color);
+        camera_init(&camera, (vec3){0.0f, 0.0f, 3.0f},
+                    (vec3){0.0f, 1.0f, 0.0f}, YAW, PITCH);
         while (!glfwWindowShouldClose(window)) {
                 curr_frame = (float)glfwGetTime();
                 delta_time = curr_frame - last_frame;
@@ -185,32 +190,36 @@ int main(void)
                 process_input(window);
                 glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                shader_use(&shader);
-                shader_load_vec3(&shader, "object_color", &object_color);
-                shader_load_vec3(&shader, "light_color", &light_color);
-                gb_mat4_identity(&model);
-                camera_calc_view(&view, &camera);
-                gb_mat4_perspective(&projection, gb_to_radians(camera.zoom),
-                                    (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f,
-                                    100.0f);
-                shader_load_mat4(&shader, "model", &model);
-                shader_load_mat4(&shader, "view", &view);
-                shader_load_mat4(&shader, "projection", &projection);
-                glBindVertexArray(vao);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
                 shader_use(&lighting_shader);
-                gb_mat4_translate(&translate, gb_vec3(1.2f, 1.0f, 2.0f));
-                gb_mat4_scale(&scale, gb_vec3(0.2f, 0.2f, 0.2f));
-                gb_mat4_mul(&model, &translate, &scale);
-                shader_load_mat4(&lighting_shader, "model", &model);
-                shader_load_mat4(&lighting_shader, "view", &view);
-                shader_load_mat4(&lighting_shader, "projection", &projection);
-                glBindVertexArray(lighting_vao);
+                shader_load_vec3(&lighting_shader, "cube_color", cube_color);
+                shader_load_vec3(&lighting_shader, "lamp_color", lamp_color);
+                shader_load_vec3(&lighting_shader, "lamp_pos", lamp_pos);
+                shader_load_vec3(&lighting_shader, "view_pos", camera.pos);
+                glm_mat4_identity(model);
+                glm_rotate_y(model, glm_rad((float)glfwGetTime() * 20.0f),
+                             model);
+                camera_calc_view(&camera, view);
+                glm_perspective(glm_rad(camera.zoom),
+                                (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f,
+                                100.0f, projection);
+                shader_load_mat4(&lighting_shader, "model", model);
+                shader_load_mat4(&lighting_shader, "view", view);
+                shader_load_mat4(&lighting_shader, "projection", projection);
+                glBindVertexArray(cube_vao);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+                shader_use(&lamp_shader);
+                glm_mat4_identity(model);
+                glm_translate(model, lamp_pos);
+                glm_scale(model, (vec3){0.2f, 0.2f, 0.2f});
+                shader_load_mat4(&lamp_shader, "model", model);
+                shader_load_mat4(&lamp_shader, "view", view);
+                shader_load_mat4(&lamp_shader, "projection", projection);
+                glBindVertexArray(lamp_vao);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
                 glfwSwapBuffers(window);
                 glfwPollEvents();
         }
-        glDeleteVertexArrays(1, &vao);
+        glDeleteVertexArrays(1, &cube_vao);
         glDeleteBuffers(1, &vbo);
         glfwTerminate();
         return 0;

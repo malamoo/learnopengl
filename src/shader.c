@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "../external/glad.h"
-#include "../external/gb_math.h"
+#include "../external/glad/glad.h"
+#include "../external/cglm/cglm.h"
 #include "../include/shader.h"
 
 typedef enum ShaderType {
@@ -61,37 +61,37 @@ void shader_load_float(Shader *shader, const char *name, float value)
         glUniform1f(glGetUniformLocation(shader->id, name), value);
 }
 
-void shader_load_vec2(Shader *shader, const char *name, gbVec2 *value)
+void shader_load_vec2(Shader *shader, const char *name, vec2 value)
 {
-        glUniform2fv(glGetUniformLocation(shader->id, name), 1, value->e);
+        glUniform2fv(glGetUniformLocation(shader->id, name), 1, value);
 }
 
-void shader_load_vec3(Shader *shader, const char *name, gbVec3 *value)
+void shader_load_vec3(Shader *shader, const char *name, vec3 value)
 {
-        glUniform3fv(glGetUniformLocation(shader->id, name), 1, value->e);
+        glUniform3fv(glGetUniformLocation(shader->id, name), 1, value);
 }
 
-void shader_load_vec4(Shader *shader, const char *name, gbVec4 *value)
+void shader_load_vec4(Shader *shader, const char *name, vec4 value)
 {
-        glUniform4fv(glGetUniformLocation(shader->id, name), 1, value->e);
+        glUniform4fv(glGetUniformLocation(shader->id, name), 1, value);
 }
 
-void shader_load_mat2(Shader *shader, const char *name, gbMat2 *value)
+void shader_load_mat2(Shader *shader, const char *name, mat2 value)
 {
         glUniformMatrix2fv(glGetUniformLocation(shader->id, name), 1, GL_FALSE,
-                           value->e);
+                           (float *)value);
 }
 
-void shader_load_mat3(Shader *shader, const char *name, gbMat3 *value)
+void shader_load_mat3(Shader *shader, const char *name, mat3 value)
 {
         glUniformMatrix3fv(glGetUniformLocation(shader->id, name), 1, GL_FALSE,
-                           value->e);
+                           (float *)value);
 }
 
-void shader_load_mat4(Shader *shader, const char *name, gbMat4 *value)
+void shader_load_mat4(Shader *shader, const char *name, mat4 value)
 {
         glUniformMatrix4fv(glGetUniformLocation(shader->id, name), 1, GL_FALSE,
-                           value->e);
+                           (float *)value);
 }
 
 /* Reads an entire file and returns the characters as a string. */

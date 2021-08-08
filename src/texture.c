@@ -1,5 +1,5 @@
-#include "../external/glad.h"
-#include "../external/stb_image.h"
+#include "../external/glad/glad.h"
+#include "../external/stb/stb_image.h"
 #include "../include/texture.h"
 
 /* Makes a texture from the specified image file. */

@@ -1,20 +1,9 @@
-#include "../external/glad.h"
-#include "../external/glfw.h"
-#include "../external/gb_math.h"
-
-typedef enum camera_move {
-    FORWARD,
-    BACKWARD,
-    LEFT,
-    RIGHT
-} CameraMove;
-
-typedef struct camera {
-    gbVec3 pos;
-    gbVec3 front;
-    gbVec3 up;
-    gbVec3 right;
-    gbVec3 world_up;
+typedef struct Camera {
+    vec3 pos;
+    vec3 front;
+    vec3 up;
+    vec3 right;
+    vec3 world_up;
     float yaw;
     float pitch;
     float move_speed;
@@ -22,9 +11,16 @@ typedef struct camera {
     float zoom;
 } Camera;
 
+typedef enum CameraMove {
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT
+} CameraMove;
+
 void
-camera_init(Camera *camera, gbVec3 position, gbVec3 up, float yaw, float pitch);
-void camera_calc_view(gbMat4 *view, Camera *camera);
+camera_init(Camera *camera, vec3 position, vec3 up, float yaw, float pitch);
+void camera_calc_view(Camera *camera, mat4 view);
 void camera_proc_kb(Camera *camera, CameraMove camera_move, float delta_time);
 void camera_proc_mouse(Camera *camera, float x_off, float y_off, int bounded);
 void camera_proc_scroll(Camera *camera, float y_off);
