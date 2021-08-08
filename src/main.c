@@ -144,7 +144,8 @@ int main(void)
 #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-        window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Game", NULL, NULL);
+        window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL Example",
+                                  NULL, NULL);
         if (window == NULL) {
                 printf("Error: failed to create GLFW window\n");
                 glfwTerminate();
@@ -179,10 +180,10 @@ int main(void)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
                               (void *)0);
         glEnableVertexAttribArray(0);
-        glm_vec3((vec3){1.0f, 0.5f, 0.31f}, cube_color);
-        glm_vec3((vec3){1.0f, 1.0f, 1.0f}, lamp_color);
-        camera_init(&camera, (vec3){0.0f, 0.0f, 3.0f},
-                    (vec3){0.0f, 1.0f, 0.0f}, YAW, PITCH);
+        glm_vec3((vec3){ 1.0f, 0.5f, 0.31f }, cube_color);
+        glm_vec3((vec3){ 1.0f, 1.0f, 1.0f }, lamp_color);
+        camera_init(&camera, (vec3){ 0.0f, 0.0f, 3.0f },
+                    (vec3){ 0.0f, 1.0f, 0.0f }, YAW, PITCH);
         while (!glfwWindowShouldClose(window)) {
                 curr_frame = (float)glfwGetTime();
                 delta_time = curr_frame - last_frame;
@@ -196,8 +197,6 @@ int main(void)
                 shader_load_vec3(&lighting_shader, "lamp_pos", lamp_pos);
                 shader_load_vec3(&lighting_shader, "view_pos", camera.pos);
                 glm_mat4_identity(model);
-                glm_rotate_y(model, glm_rad((float)glfwGetTime() * 20.0f),
-                             model);
                 camera_calc_view(&camera, view);
                 glm_perspective(glm_rad(camera.zoom),
                                 (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f,
@@ -210,7 +209,7 @@ int main(void)
                 shader_use(&lamp_shader);
                 glm_mat4_identity(model);
                 glm_translate(model, lamp_pos);
-                glm_scale(model, (vec3){0.2f, 0.2f, 0.2f});
+                glm_scale(model, (vec3){ 0.2f, 0.2f, 0.2f });
                 shader_load_mat4(&lamp_shader, "model", model);
                 shader_load_mat4(&lamp_shader, "view", view);
                 shader_load_mat4(&lamp_shader, "projection", projection);

@@ -18,14 +18,14 @@ ifeq ($(UNAME_S), Darwin)
 endif
 
 .PHONY: all
-all: mkdir bin/game
+all: mkdir bin/example
 
 .PHONY: mkdir
 mkdir:
 	mkdir -p build bin
 
-bin/game: build/glfw.o build/glad.o build/stb_image.o \
-		  build/shader.o build/texture.o build/camera.o build/game.o
+bin/example: build/glfw.o build/glad.o build/stb_image.o \
+		  build/shader.o build/texture.o build/camera.o build/main.o
 	cc $(GLFW_FWS) -o $@ $^ $(LIBS)
 
 build/glfw.o: external/glfw/glfw.c
@@ -46,7 +46,7 @@ build/shader.o: src/shader.c
 build/camera.o: src/camera.c
 	cc $(CFLAGS) -c $^ -o $@
 
-build/game.o: src/game.c
+build/main.o: src/main.c
 	cc $(CFLAGS) -c $^ -o $@
 
 .PHONY: clean
