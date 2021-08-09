@@ -12,7 +12,7 @@ typedef enum ShaderType {
 
 long count_bytes(FILE *fp);
 char *fread_str(const char *name);
-void check_success(unsigned int shader, ShaderType type);
+void check_errors(unsigned int shader, ShaderType type);
 
 /* Initializes a shader program by linking the specified shaders. */
 void shader_init(Shader *shader, const char *vertex_path,
@@ -28,16 +28,16 @@ void shader_init(Shader *shader, const char *vertex_path,
         vertex = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertex, 1, (const char **)&vertex_code, NULL);
         glCompileShader(vertex);
-        check_success(vertex, VERTEX);
+        check_errors(vertex, VERTEX);
         fragment = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fragment, 1, (const char **)&fragment_code, NULL);
         glCompileShader(fragment);
-        check_success(fragment, FRAGMENT);
+        check_errors(fragment, FRAGMENT);
         shader->id = glCreateProgram();
         glAttachShader(shader->id, vertex);
         glAttachShader(shader->id, fragment);
         glLinkProgram(shader->id);
-        check_success(shader->id, PROGRAM);
+        check_errors(shader->id, PROGRAM);
         free(vertex_code);
         free(fragment_code);
         glDeleteShader(vertex);
@@ -125,7 +125,7 @@ long count_bytes(FILE *fp)
  * Prints error messages if the shaders have compilation
  * or linking errors.
  */
-void check_success(unsigned int shader, ShaderType type)
+void check_errors(unsigned int shader, ShaderType type)
 {
         int success;
         char info_log[1024];

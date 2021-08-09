@@ -15,7 +15,8 @@ typedef enum CameraMove {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP
 } CameraMove;
 
 void

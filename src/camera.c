@@ -56,6 +56,10 @@ void camera_proc_kb(Camera *camera, CameraMove camera_move, float delta_time)
                 glm_vec3_scale(camera->right, velocity, delta_pos);
                 glm_vec3_add(camera->pos, delta_pos, camera->pos);
         }
+        if (camera_move == UP) {
+                glm_vec3_scale(camera->world_up, velocity, delta_pos);
+                glm_vec3_add(camera->pos, delta_pos, camera->pos);
+        }
 }
 
 /*
