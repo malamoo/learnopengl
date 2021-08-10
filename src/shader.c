@@ -10,8 +10,8 @@ typedef enum ShaderType {
     PROGRAM
 } ShaderType;
 
-long count_bytes(FILE *fp);
-char *fread_str(const char *name);
+long file_size(FILE *fp);
+char *read_file(const char *name);
 void check_errors(unsigned int shader, ShaderType type);
 
 /* Initializes a shader program by linking the specified shaders. */
@@ -23,8 +23,8 @@ void shader_init(Shader *shader, const char *vertex_path,
         unsigned int vertex;
         unsigned int fragment;
 
-        vertex_code = fread_str(vertex_path);
-        fragment_code = fread_str(fragment_path);
+        vertex_code = read_file(vertex_path);
+        fragment_code = read_file(fragment_path);
         vertex = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertex, 1, (const char **)&vertex_code, NULL);
         glCompileShader(vertex);
@@ -94,31 +94,31 @@ void shader_assign_mat4(Shader *shader, const char *name, mat4 value)
                            (float *)value);
 }
 
-/* Reads an entire file and returns the characters as a string. */
-char *fread_str(const char *name)
+/* Reads an entire file as a string. */
+char *read_file(const char *name)
 {
         FILE *fp;
-        long count;
+        long size;
         char *str;
 
         fp = fopen(name, "r");
-        count = count_bytes(fp);
-        str = calloc(count + 1, sizeof(char));
-        str[count] = '\0';
-        fread(str, sizeof(char), count, fp);
+        size = file_size(fp);
+        str = calloc(size + 1, sizeof(char));
+        str[size] = '\0';
+        fread(str, sizeof(char), size, fp);
         fclose(fp);
         return str;
 }
 
 /* Returns the number of bytes in a file. */
-long count_bytes(FILE *fp)
+long file_size(FILE *fp)
 {
-        long count;
+        long size;
 
         fseek(fp, 0, SEEK_END);
-        count = ftell(fp);
+        size = ftell(fp);
         rewind(fp);
-        return count;
+        return size;
 }
 
 /*

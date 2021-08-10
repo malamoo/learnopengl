@@ -8,10 +8,9 @@ const float ZOOM = 45.0f;
 void camera_update_vectors(Camera *camera);
 
 /* Initializes a camera with the specified configuration. */
-void
-camera_init(Camera *camera, vec3 position, vec3 up, float yaw, float pitch)
+void camera_init(Camera *camera, vec3 position, vec3 up, float yaw, float pitch)
 {
-        glm_vec3(position, camera->pos);
+        glm_vec3(position, camera->position);
         glm_vec3(up, camera->world_up);
         camera->yaw = yaw;
         camera->pitch = pitch;
@@ -30,8 +29,8 @@ void camera_calc_view(Camera *camera, mat4 view)
 {
         vec3 centre;
 
-        glm_vec3_add(camera->pos, camera->front, centre);
-        glm_lookat(camera->pos, centre, camera->up, view);
+        glm_vec3_add(camera->position, camera->front, centre);
+        glm_lookat(camera->position, centre, camera->up, view);
 }
 
 /* Processes input received from any keyboard-like input system. */
@@ -42,23 +41,23 @@ void camera_proc_kb(Camera *camera, CameraMove camera_move, float delta_time)
 
         if (camera_move == FORWARD) {
                 glm_vec3_scale(camera->front, velocity, delta_pos);
-                glm_vec3_add(camera->pos, delta_pos, camera->pos);
+                glm_vec3_add(camera->position, delta_pos, camera->position);
         }
         if (camera_move == BACKWARD) {
                 glm_vec3_scale(camera->front, velocity, delta_pos);
-                glm_vec3_sub(camera->pos, delta_pos, camera->pos);
+                glm_vec3_sub(camera->position, delta_pos, camera->position);
         }
         if (camera_move == LEFT) {
                 glm_vec3_scale(camera->right, velocity, delta_pos);
-                glm_vec3_sub(camera->pos, delta_pos, camera->pos);
+                glm_vec3_sub(camera->position, delta_pos, camera->position);
         }
         if (camera_move == RIGHT) {
                 glm_vec3_scale(camera->right, velocity, delta_pos);
-                glm_vec3_add(camera->pos, delta_pos, camera->pos);
+                glm_vec3_add(camera->position, delta_pos, camera->position);
         }
         if (camera_move == UP) {
                 glm_vec3_scale(camera->world_up, velocity, delta_pos);
-                glm_vec3_add(camera->pos, delta_pos, camera->pos);
+                glm_vec3_add(camera->position, delta_pos, camera->position);
         }
 }
 
