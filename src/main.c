@@ -27,9 +27,6 @@ int first_mouse = 1;
 float delta_time = 0.0f;
 float last_frame = 0.0f;
 
-/* Lighting globals */
-vec3 light_pos = (vec3){ 1.2f, 1.0f, 2.0f };
-
 int main(void)
 {
         GLFWwindow *window;
@@ -77,6 +74,17 @@ int main(void)
                 -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
                 -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
         };
+        vec3 cube_positions[] = {
+                {  2.0f,  5.0f, -15.0f },
+                { -1.5f, -2.2f, -2.5f  },
+                { -3.8f, -2.0f, -12.3f },
+                {  2.4f, -0.4f, -3.5f  },
+                { -1.7f,  3.0f, -7.5f  },
+                {  1.3f, -2.0f, -2.5f  },
+                {  1.5f,  2.0f, -2.5f  },
+                {  1.5f,  0.2f, -1.5f  },
+                { -1.3f,  1.0f, -1.5f  }
+        };
         unsigned int vbo;
         unsigned int cube_vao;
         unsigned int light_vao;
@@ -88,6 +96,8 @@ int main(void)
         mat4 view;
         mat4 projection;
         float curr_frame;
+        float angle;
+        int i;
 
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -149,24 +159,34 @@ int main(void)
                 shader_use(&lighting_shader);
                 shader_assign_int(&lighting_shader, "material.diffuse", 0);
                 shader_assign_int(&lighting_shader, "material.specular", 1);
-                shader_assign_vec3(&lighting_shader, "material.specular",
-                                   (vec3){ 0.5f, 0.5f, 0.5f });
                 shader_assign_float(&lighting_shader, "material.shininess",
-                                    64.0f);
+                                    32.0f);
                 shader_assign_vec3(&lighting_shader, "light.ambient",
-                                   (vec3){ 0.2f, 0.2f, 0.2f });
+                                   (vec3){ 0.1f, 0.1f, 0.1f });
                 shader_assign_vec3(&lighting_shader, "light.diffuse",
-                                   (vec3){ 0.5f, 0.5f, 0.5f });
+                                   (vec3){ 0.8f, 0.8f, 0.8f });
                 shader_assign_vec3(&lighting_shader, "light.specular",
                                    (vec3){ 1.0f, 1.0f, 1.0f });
-                shader_assign_vec3(&lighting_shader, "light.position", light_pos);
-                shader_assign_vec3(&lighting_shader, "view_pos", camera.position);
-                glm_mat4_identity(model);
+                shader_assign_vec3(&lighting_shader, "light.position",
+                                   camera.position);
+                shader_assign_vec3(&lighting_shader, "light.direction",
+                                   camera.front);
+                shader_assign_float(&lighting_shader, "light.cut_off",
+                                    cosf(glm_rad(12.5f)));
+                shader_assign_float(&lighting_shader, "light.outer_cut_off",
+                                    cosf(glm_rad(17.5f)));
+                shader_assign_float(&lighting_shader, "light.constant",
+                                    1.0f);
+                shader_assign_float(&lighting_shader, "light.linear",
+                                    0.09f);
+                shader_assign_float(&lighting_shader, "light.quadratic",
+                                    0.032f);
+                shader_assign_vec3(&lighting_shader, "view_pos",
+                                   camera.position);
                 camera_calc_view(&camera, view);
                 glm_perspective(glm_rad(camera.zoom),
                                 (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f,
                                 100.0f, projection);
-                shader_assign_mat4(&lighting_shader, "model", model);
                 shader_assign_mat4(&lighting_shader, "view", view);
                 shader_assign_mat4(&lighting_shader, "projection", projection);
                 glActiveTexture(GL_TEXTURE0);
@@ -174,16 +194,14 @@ int main(void)
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_2D, specular_map.id);
                 glBindVertexArray(cube_vao);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
-                shader_use(&light_shader);
-                glm_mat4_identity(model);
-                glm_translate(model, light_pos);
-                glm_scale(model, (vec3){ 0.2f, 0.2f, 0.2f });
-                shader_assign_mat4(&light_shader, "model", model);
-                shader_assign_mat4(&light_shader, "view", view);
-                shader_assign_mat4(&light_shader, "projection", projection);
-                glBindVertexArray(light_vao);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
+                for (i = 0; i < 10; i++) {
+                        glm_mat4_identity(model);
+                        glm_translate(model, cube_positions[i]);
+                        angle = 20.0f * (float)i;
+                        glm_rotate(model, angle, (vec3){ 1.0f, 0.3f, 0.5f });
+                        shader_assign_mat4(&lighting_shader, "model", model);
+                        glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
                 glfwSwapBuffers(window);
                 glfwPollEvents();
         }

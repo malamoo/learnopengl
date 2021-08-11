@@ -1,5 +1,5 @@
-CFLAGS = -Wall -Werror -std=c99
-LIBS = -lm -ldl -pthread
+CFLAGS = -Wall -Werror -std=c99 -pthread
+LIBS = -lm -ldl
 
 GLFW_CFLAGS = -w
 GLFW_DEFS = -DLSH_GLFW_IMPLEMENTATION 
