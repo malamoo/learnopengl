@@ -230,6 +230,8 @@ void process_input(GLFWwindow *window)
                 camera_proc_kb(&camera, RIGHT, delta_time);
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
                 camera_proc_kb(&camera, UP, delta_time);
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+                camera_proc_kb(&camera, DOWN, delta_time);
 }
 
 /* Called by GLFW whenever the framebuffer is resized. */

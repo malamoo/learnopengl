@@ -16,7 +16,8 @@ typedef enum CameraMove {
     BACKWARD,
     LEFT,
     RIGHT,
-    UP
+    UP,
+    DOWN
 } CameraMove;
 
 void camera_init(Camera *camera, vec3 position, vec3 up, float yaw, float
