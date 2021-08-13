@@ -27,6 +27,10 @@ int first_mouse = 1;
 float delta_time = 0.0f;
 float last_frame = 0.0f;
 
+/* Lighting globals */
+vec3 point_light_position = { 0.7f, 0.2f, 2.0f };
+vec3 dir_light_direction = { -0.2f, -1.0f, -0.3f };
+
 int main(void)
 {
         GLFWwindow *window;
@@ -76,20 +80,20 @@ int main(void)
         };
         vec3 cube_positions[] = {
                 {  2.0f,  5.0f, -15.0f },
-                { -1.5f, -2.2f, -2.5f  },
+                { -1.5f, -2.2f,  -2.5f },
                 { -3.8f, -2.0f, -12.3f },
-                {  2.4f, -0.4f, -3.5f  },
-                { -1.7f,  3.0f, -7.5f  },
-                {  1.3f, -2.0f, -2.5f  },
-                {  1.5f,  2.0f, -2.5f  },
-                {  1.5f,  0.2f, -1.5f  },
-                { -1.3f,  1.0f, -1.5f  }
+                {  2.4f, -0.4f,  -3.5f },
+                { -1.7f,  3.0f,  -7.5f },
+                {  1.3f, -2.0f,  -2.5f },
+                {  1.5f,  2.0f,  -2.5f },
+                {  1.5f,  0.2f,  -1.5f },
+                { -1.3f,  1.0f,  -1.5f }
         };
         unsigned int vbo;
         unsigned int cube_vao;
-        unsigned int light_vao;
+        unsigned int point_light_vao;
         Shader lighting_shader;
-        Shader light_shader;
+        Shader point_light_shader;
         Texture2d diffuse_map;
         Texture2d specular_map;
         mat4 model;
@@ -138,13 +142,14 @@ int main(void)
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
-        glGenVertexArrays(1, &light_vao);
-        glBindVertexArray(light_vao);
+        glGenVertexArrays(1, &point_light_vao);
+        glBindVertexArray(point_light_vao);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                               (void *)0);
         glEnableVertexAttribArray(0);
         shader_init(&lighting_shader, "src/lighting.vert", "src/lighting.frag");
-        shader_init(&light_shader, "src/light.vert", "src/light.frag");
+        shader_init(&point_light_shader, "src/point_light.vert",
+                    "src/point_light.frag");
         texture_2d_load(&diffuse_map, "assets/container2.png");
         texture_2d_load(&specular_map, "assets/container2_specular.png");
         camera_init(&camera, (vec3){ 0.0f, 0.0f, 3.0f },
@@ -161,25 +166,27 @@ int main(void)
                 shader_assign_int(&lighting_shader, "material.specular", 1);
                 shader_assign_float(&lighting_shader, "material.shininess",
                                     32.0f);
-                shader_assign_vec3(&lighting_shader, "light.ambient",
-                                   (vec3){ 0.1f, 0.1f, 0.1f });
-                shader_assign_vec3(&lighting_shader, "light.diffuse",
-                                   (vec3){ 0.8f, 0.8f, 0.8f });
-                shader_assign_vec3(&lighting_shader, "light.specular",
+                shader_assign_vec3(&lighting_shader, "dir_light.ambient",
+                                   (vec3){ 0.2f, 0.2f, 0.2f });
+                shader_assign_vec3(&lighting_shader, "dir_light.diffuse",
+                                   (vec3){ 0.5f, 0.5f, 0.5f });
+                shader_assign_vec3(&lighting_shader, "dir_light.specular",
                                    (vec3){ 1.0f, 1.0f, 1.0f });
-                shader_assign_vec3(&lighting_shader, "light.position",
-                                   camera.position);
-                shader_assign_vec3(&lighting_shader, "light.direction",
-                                   camera.front);
-                shader_assign_float(&lighting_shader, "light.cut_off",
-                                    cosf(glm_rad(12.5f)));
-                shader_assign_float(&lighting_shader, "light.outer_cut_off",
-                                    cosf(glm_rad(17.5f)));
-                shader_assign_float(&lighting_shader, "light.constant",
+                shader_assign_vec3(&lighting_shader, "dir_light.direction",
+                                   dir_light_direction);
+                shader_assign_vec3(&lighting_shader, "point_lights.position",
+                                   point_light_position);
+                shader_assign_vec3(&lighting_shader, "point_light.ambient",
+                                   (vec3){ 0.2f, 0.2f, 0.2f });
+                shader_assign_vec3(&lighting_shader, "point_light.diffuse",
+                                   (vec3){ 0.5f, 0.5f, 0.5f });
+                shader_assign_vec3(&lighting_shader, "point_light.specular",
+                                   (vec3){ 1.0f, 1.0f, 1.0f });
+                shader_assign_float(&lighting_shader, "point_light.constant",
                                     1.0f);
-                shader_assign_float(&lighting_shader, "light.linear",
+                shader_assign_float(&lighting_shader, "point_light.linear",
                                     0.09f);
-                shader_assign_float(&lighting_shader, "light.quadratic",
+                shader_assign_float(&lighting_shader, "point_light.quadratic",
                                     0.032f);
                 shader_assign_vec3(&lighting_shader, "view_pos",
                                    camera.position);
@@ -202,11 +209,20 @@ int main(void)
                         shader_assign_mat4(&lighting_shader, "model", model);
                         glDrawArrays(GL_TRIANGLES, 0, 36);
                 }
+                shader_use(&point_light_shader);
+                glm_mat4_identity(model);
+                glm_translate(model, point_light_position);
+                glm_scale(model, (vec3){ 0.2f, 0.2f, 0.2f });
+                shader_assign_mat4(&point_light_shader, "model", model);
+                shader_assign_mat4(&point_light_shader, "view", view);
+                shader_assign_mat4(&point_light_shader, "projection", projection);
+                glBindVertexArray(point_light_vao);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
                 glfwSwapBuffers(window);
                 glfwPollEvents();
         }
         glDeleteVertexArrays(1, &cube_vao);
-        glDeleteVertexArrays(1, &light_vao);
+        glDeleteVertexArrays(1, &point_light_vao);
         glDeleteBuffers(1, &vbo);
         glfwTerminate();
         return 0;
