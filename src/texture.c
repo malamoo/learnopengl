@@ -2,6 +2,7 @@
 #include "../external/stb/stb_image.h"
 #include "../include/texture.h"
 
+/* Load an image to create a 2D texture. */
 void texture_2d_load(Texture2d *texture, const char *texture_path)
 {
         unsigned char *data;
