@@ -1,5 +1,5 @@
-typedef struct Texture2d {
+typedef struct Texture {
     unsigned int id;
-} Texture2d;
+} Texture;
 
-void texture_2d_load(Texture2d *texture, const char *texture_path);
+void texture_load(Texture *texture, const char *texture_path);

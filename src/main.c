@@ -2,6 +2,7 @@
 #include "../external/glad/glad.h"
 #include "../external/glfw/glfw.h"
 #include "../external/cglm/cglm.h"
+#include "../external/cgltf/cgltf.h"
 #include "../include/shader.h"
 #include "../include/texture.h"
 #include "../include/camera.h"
@@ -94,8 +95,8 @@ int main(void)
         unsigned int point_light_vao;
         Shader lighting_shader;
         Shader point_light_shader;
-        Texture2d diffuse_map;
-        Texture2d specular_map;
+        Texture diffuse_map;
+        Texture specular_map;
         mat4 model;
         mat4 view;
         mat4 projection;
@@ -150,8 +151,8 @@ int main(void)
         shader_init(&lighting_shader, "src/lighting.vert", "src/lighting.frag");
         shader_init(&point_light_shader, "src/point_light.vert",
                     "src/point_light.frag");
-        texture_2d_load(&diffuse_map, "assets/container2.png");
-        texture_2d_load(&specular_map, "assets/container2_specular.png");
+        texture_load(&diffuse_map, "assets/container2.png");
+        texture_load(&specular_map,"assets/container2_specular.png");
         camera_init(&camera, (vec3){ 0.0f, 0.0f, 3.0f },
                     (vec3){ 0.0f, 1.0f, 0.0f }, YAW, PITCH);
         while (!glfwWindowShouldClose(window)) {

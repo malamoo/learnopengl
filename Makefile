@@ -6,6 +6,7 @@ GLFW_DEFS = -DLSH_GLFW_IMPLEMENTATION
 GLAD_CFLAGS = -w
 STB_CFLAGS = -w
 GB_CFLAGS = -w
+CGLTF_CFLAGS = -w
 
 UNAME_S = $(shell uname -s)
 ifeq ($(UNAME_S), Linux)
@@ -24,8 +25,9 @@ all: mkdir bin/example
 mkdir:
 	mkdir -p build bin
 
-bin/example: build/glfw.o build/glad.o build/stb_image.o \
-		  build/shader.o build/texture.o build/camera.o build/main.o
+bin/example: build/glfw.o build/glad.o build/cgltf.o build/stb_image.o \
+			 build/stb_ds.o build/stb_sprintf.o \
+			 build/shader.o build/texture.o build/camera.o build/main.o
 	cc $(GLFW_FWS) -o $@ $^ $(LIBS)
 
 build/glfw.o: external/glfw/glfw.c
@@ -34,7 +36,16 @@ build/glfw.o: external/glfw/glfw.c
 build/glad.o: external/glad/glad.c
 	cc $(GLAD_CFLAGS) -c $^ -o $@
 
+build/cgltf.o: external/cgltf/cgltf.c
+	cc $(CGLTF_CFLAGS) -c $^ -o $@
+
 build/stb_image.o: external/stb/stb_image.c
+	cc $(STB_CFLAGS) -c $^ -o $@
+
+build/stb_ds.o: external/stb/stb_ds.c
+	cc $(STB_CFLAGS) -c $^ -o $@
+
+build/stb_sprintf.o: external/stb/stb_sprintf.c
 	cc $(STB_CFLAGS) -c $^ -o $@
 
 build/texture.o: src/texture.c
